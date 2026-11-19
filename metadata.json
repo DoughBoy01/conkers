@@ -1,0 +1,6 @@
+{
+  "name": "Conkers: An Illustrated Guide",
+  "description": "An interactive British storybook animated film and playable physics match explaining the traditional English autumn game of conkers.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
