@@ -91,21 +91,21 @@ export const RulesStrip: React.FC<RulesStripProps> = ({
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="border-b border-ink/10 bg-parchment/70 text-xs font-medium text-bark">
-                  <th className="px-4 py-3">Wins</th>
-                  <th className="px-4 py-3">Title</th>
-                  <th className="px-4 py-3">Meaning</th>
+                  <th className="px-2.5 sm:px-4 py-3">Wins</th>
+                  <th className="px-2.5 sm:px-4 py-3">Title</th>
+                  <th className="px-2.5 sm:px-4 py-3">Meaning</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-ink/8 text-sm">
                 {RANK_LADDER.map((row) => (
                   <tr key={row.name}>
-                    <td className="px-4 py-3 font-mono text-xs font-semibold text-chestnut tabular-nums">
+                    <td className="px-2.5 sm:px-4 py-3 font-mono text-xs font-semibold text-chestnut tabular-nums">
                       {row.wins}
                     </td>
-                    <td className="px-4 py-3 font-display font-semibold text-ink whitespace-nowrap">
+                    <td className="px-2.5 sm:px-4 py-3 font-display font-semibold text-ink whitespace-nowrap">
                       {row.name}
                     </td>
-                    <td className="px-4 py-3 text-bark">{row.note}</td>
+                    <td className="px-2.5 sm:px-4 py-3 text-bark">{row.note}</td>
                   </tr>
                 ))}
               </tbody>

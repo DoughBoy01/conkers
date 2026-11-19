@@ -39,3 +39,21 @@
     scroll-behavior: auto;
   }
 }
+
+/* Touch screens: comfortable tap targets, no double-tap zoom delay, no grey tap flash */
+@media (pointer: coarse) {
+  button,
+  [role="button"] {
+    min-height: 44px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+@layer base {
+  body {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}

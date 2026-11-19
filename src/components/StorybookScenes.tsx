@@ -94,8 +94,97 @@ export const StorybookScenes: React.FC<StorybookScenesProps> = ({
   // Show poster overlay only before user starts watching
   const showTitlePoster = !hasStarted && currentTime === 0;
 
+  const captionBox = (
+          <div className="max-w-2xl rounded-lg bg-ink/90 px-4 py-2.5 md:px-5 text-center shadow-md backdrop-blur-xs">
+            {subtitleMode !== "dz" && (
+              <p className="text-sm md:text-base font-medium leading-snug text-vellum">
+                {caption?.en}
+              </p>
+            )}
+            {subtitleMode !== "en" && (
+              <p
+                lang="dz"
+                style={{ fontFamily: "var(--font-dzongkha)" }}
+                className={`text-sm md:text-base font-medium leading-relaxed text-parchment/95 ${
+                  subtitleMode === "both"
+                    ? "mt-1.5 border-t border-vellum/15 pt-1.5"
+                    : ""
+                }`}
+              >
+                {caption?.dz}
+              </p>
+            )}
+          </div>
+  );
+
+  const posterCopy = (
+    <>
+            <p className="text-xs font-medium tracking-wide text-chestnut">
+              An English Autumn Tradition · 0:54 Animated Explainer
+            </p>
+            <h2 className="mt-1 md:mt-2 max-w-md font-display text-2xl md:text-5xl font-semibold tracking-tight text-ink">
+              How to Play Conkers
+            </h2>
+            <p className="mt-2 md:mt-3 max-w-md text-sm md:text-base leading-relaxed text-bark">
+              Follow the journey of a humble horse chestnut from autumn tree to
+              playground champion—then test your swing in the backyard finale.
+            </p>
+            <div className="mt-4 md:mt-6 flex flex-wrap items-center gap-3">
+              <button
+                type="button"
+                onClick={onStartFilm}
+                className="inline-flex items-center gap-2.5 rounded-lg bg-chestnut px-5 py-2.5 text-sm font-semibold text-vellum shadow-sm transition-colors hover:bg-chestnut-deep focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-chestnut cursor-pointer whitespace-nowrap shrink-0"
+              >
+                <Play className="h-4 w-4 fill-current" />
+                Play Short Film
+              </button>
+              <button
+                type="button"
+                onClick={onEnterFinale}
+                className="inline-flex items-center gap-2 rounded-lg border border-ink/20 bg-vellum/90 px-4 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-parchment focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink cursor-pointer whitespace-nowrap shrink-0"
+              >
+                <Swords className="h-4 w-4" />
+                Play Game
+              </button>
+            </div>
+    </>
+  );
+
+  const finishBanner = (
+          <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-ink/15 bg-vellum/96 px-5 py-3.5 shadow-lg backdrop-blur-xs">
+            <div className="text-left">
+              <p className="font-mono text-xs font-medium text-oakmoss">
+                Film Complete
+              </p>
+              <p className="font-display text-base font-semibold text-ink">
+                Ready to try a match at arm&apos;s length?
+              </p>
+            </div>
+            <div className="flex items-center gap-2.5">
+              <button
+                type="button"
+                onClick={onEnterFinale}
+                className="inline-flex items-center gap-2 rounded-lg bg-chestnut px-4 py-2 text-xs font-semibold text-vellum transition-colors hover:bg-chestnut-deep cursor-pointer whitespace-nowrap shrink-0"
+              >
+                <Swords className="h-3.5 w-3.5" />
+                Play Game
+              </button>
+              <button
+                type="button"
+                onClick={onReplayFilm}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-ink/20 bg-parchment px-3.5 py-2 text-xs font-medium text-ink transition-colors hover:bg-vellum cursor-pointer whitespace-nowrap shrink-0"
+              >
+                <RotateCcw className="h-3.5 w-3.5" />
+                Replay
+              </button>
+            </div>
+          </div>
+  );
+
   return (
-    <div className="relative w-full aspect-video overflow-hidden rounded-xl border border-ink/15 bg-parchment shadow-sm select-none">
+    <div className="relative w-full md:aspect-video overflow-hidden rounded-xl border border-ink/15 bg-parchment shadow-sm select-none">
+     {/* Stage: 16:9 on every screen size. Text overlays sit on it from md up; on phones they move to the panel below. */}
+     <div className="relative aspect-video overflow-hidden md:absolute md:inset-0">
       {/* Fallback textured paper canvas */}
       <div
         className="absolute inset-0"
@@ -198,46 +287,20 @@ export const StorybookScenes: React.FC<StorybookScenesProps> = ({
 
       {/* Chapter Title Pill-Free Top-Left Storybook Header */}
       {!showTitlePoster && (
-        <div className="absolute top-5 left-6 z-20 flex items-center gap-2.5 rounded-md bg-vellum/90 px-3 py-1.5 border border-ink/12 backdrop-blur-xs">
-          <span className="font-mono text-xs font-medium text-chestnut tabular-nums">
+        <div className="absolute top-2 left-2 md:top-5 md:left-6 z-20 flex items-center gap-1.5 md:gap-2.5 rounded-md bg-vellum/90 px-2 py-1 md:px-3 md:py-1.5 border border-ink/12 backdrop-blur-xs">
+          <span className="font-mono text-[11px] md:text-xs font-medium text-chestnut tabular-nums">
             {chapter.index} / 05
           </span>
           <span className="text-bark/50" aria-hidden="true">
             ·
           </span>
-          <span className="text-xs font-medium tracking-wide text-ink">
+          <span className="text-[11px] md:text-xs font-medium tracking-wide text-ink">
             {chapter.title}
           </span>
         </div>
       )}
 
-      {/* Synchronized Bilingual Storybook Subtitles (English & Dzongkha) */}
-      {!showTitlePoster && !isFinished && caption && (
-        <div className="absolute inset-x-6 bottom-5 z-20 flex justify-center pointer-events-none">
-          <div className="max-w-2xl rounded-lg bg-ink/90 px-5 py-2.5 text-center shadow-md backdrop-blur-xs">
-            {subtitleMode !== "dz" && (
-              <p className="text-sm md:text-base font-medium leading-snug text-vellum">
-                {caption.en}
-              </p>
-            )}
-            {subtitleMode !== "en" && (
-              <p
-                lang="dz"
-                style={{ fontFamily: "var(--font-dzongkha)" }}
-                className={`text-sm md:text-base font-medium leading-relaxed text-parchment/95 ${
-                  subtitleMode === "both"
-                    ? "mt-1.5 border-t border-vellum/15 pt-1.5"
-                    : ""
-                }`}
-              >
-                {caption.dz}
-              </p>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Opening Title Poster Overlay */}
+      {/* Opening Title Poster Overlay: image everywhere, text overlay from md up */}
       {showTitlePoster && (
         <div className="absolute inset-0 z-30 flex items-center justify-center bg-vellum">
           {!imgErrors.poster && (
@@ -250,78 +313,43 @@ export const StorybookScenes: React.FC<StorybookScenesProps> = ({
             />
           )}
           <div
-            className="absolute inset-0"
+            className="absolute inset-0 hidden md:block"
             style={{
               background:
                 "linear-gradient(90deg, rgba(247,246,242,0.92) 0%, rgba(247,246,242,0.72) 48%, rgba(247,246,242,0.22) 100%)",
             }}
           />
-          <div className="relative z-10 flex w-full max-w-4xl flex-col items-start px-8 md:px-12">
-            <p className="text-xs font-medium tracking-wide text-chestnut">
-              An English Autumn Tradition · 0:54 Animated Explainer
-            </p>
-            <h2 className="mt-2 max-w-md font-display text-3xl md:text-5xl font-semibold tracking-tight text-ink">
-              How to Play Conkers
-            </h2>
-            <p className="mt-3 max-w-md text-sm md:text-base leading-relaxed text-bark">
-              Follow the journey of a humble horse chestnut from autumn tree to
-              playground champion—then test your swing in the backyard finale.
-            </p>
-            <div className="mt-6 flex flex-wrap items-center gap-3">
-              <button
-                type="button"
-                onClick={onStartFilm}
-                className="inline-flex items-center gap-2.5 rounded-lg bg-chestnut px-5 py-2.5 text-sm font-semibold text-vellum shadow-sm transition-colors hover:bg-chestnut-deep focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-chestnut cursor-pointer whitespace-nowrap shrink-0"
-              >
-                <Play className="h-4 w-4 fill-current" />
-                Play Short Film
-              </button>
-              <button
-                type="button"
-                onClick={onEnterFinale}
-                className="inline-flex items-center gap-2 rounded-lg border border-ink/20 bg-vellum/90 px-4 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-parchment focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink cursor-pointer whitespace-nowrap shrink-0"
-              >
-                <Swords className="h-4 w-4" />
-                Play Game
-              </button>
-            </div>
+          <div className="relative z-10 hidden md:flex w-full max-w-4xl flex-col items-start px-12">
+            {posterCopy}
           </div>
         </div>
       )}
 
-      {/* End-of-Film Compact Banner keeping winning conker visible */}
+      {/* End-of-film banner over the stage from md up */}
       {isFinished && (
-        <div className="absolute inset-x-6 bottom-5 z-30 flex justify-center">
-          <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-ink/15 bg-vellum/96 px-5 py-3.5 shadow-lg backdrop-blur-xs">
-            <div className="text-left">
-              <p className="font-mono text-xs font-medium text-oakmoss">
-                Film Complete
-              </p>
-              <p className="font-display text-base font-semibold text-ink">
-                Ready to try a match at arm&apos;s length?
-              </p>
-            </div>
-            <div className="flex items-center gap-2.5">
-              <button
-                type="button"
-                onClick={onEnterFinale}
-                className="inline-flex items-center gap-2 rounded-lg bg-chestnut px-4 py-2 text-xs font-semibold text-vellum transition-colors hover:bg-chestnut-deep cursor-pointer whitespace-nowrap shrink-0"
-              >
-                <Swords className="h-3.5 w-3.5" />
-                Play Game
-              </button>
-              <button
-                type="button"
-                onClick={onReplayFilm}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-ink/20 bg-parchment px-3.5 py-2 text-xs font-medium text-ink transition-colors hover:bg-vellum cursor-pointer whitespace-nowrap shrink-0"
-              >
-                <RotateCcw className="h-3.5 w-3.5" />
-                Replay
-              </button>
-            </div>
-          </div>
+        <div className="absolute inset-x-6 bottom-5 z-30 hidden md:flex justify-center">
+          {finishBanner}
         </div>
       )}
+     </div>
+
+     {/* Phone panel: subtitles, title text and end banner sit below the stage, not on it */}
+     <div className="md:hidden flex min-h-[7.5rem] items-center justify-center bg-vellum px-3 py-3">
+      {showTitlePoster ? (
+        <div className="flex w-full flex-col items-start">{posterCopy}</div>
+      ) : isFinished ? (
+        <div className="w-full">{finishBanner}</div>
+      ) : caption ? (
+        <div className="w-full">{captionBox}</div>
+      ) : null}
+     </div>
+
+     {/* Subtitles over the stage from md up */}
+     {!showTitlePoster && !isFinished && caption && (
+      <div className="absolute inset-x-6 bottom-5 z-20 hidden md:flex justify-center pointer-events-none">
+       {captionBox}
+      </div>
+     )}
     </div>
   );
 };

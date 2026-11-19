@@ -97,7 +97,7 @@ export default {
       }
       try {
         const wav = await synthesize(chapterId, env.GEMINI_API_KEY);
-        return new Response(wav, {
+        return new Response(wav as BodyInit, {
           headers: { "Content-Type": "audio/wav", "Cache-Control": "public, max-age=3600" },
         });
       } catch (e) {
@@ -112,7 +112,7 @@ export default {
     if (proxied) {
       const upstream = await fetch(IMAGE_ORIGIN + proxied, {
         cf: { cacheEverything: true, cacheTtl: 86400 },
-      });
+      } as RequestInit);
       return new Response(upstream.body, {
         status: upstream.status,
         headers: {
@@ -124,7 +124,7 @@ export default {
     const hit = FILES[url.pathname];
     if (!hit && url.pathname.startsWith("/audio/")) return new Response("Not found", { status: 404 });
     const file = hit ?? FILES["/index.html"];
-    return new Response(file.b64 ? b64ToBytes(file.b64) : file.body, {
+    return new Response((file.b64 ? b64ToBytes(file.b64) : file.body) as BodyInit, {
       headers: {
         "Content-Type": file.type,
         "Cache-Control": url.pathname.startsWith("/assets/") ? "public, max-age=31536000, immutable" : "no-cache",

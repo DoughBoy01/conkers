@@ -581,7 +581,9 @@ export const PlayableFinale: React.FC<PlayableFinaleProps> = ({
     oppHP <= 25 ? 4 : oppHP <= 50 ? 3 : oppHP <= 75 ? 2 : oppHP < 100 ? 1 : 0;
 
   return (
-    <div className="relative w-full aspect-video overflow-hidden rounded-xl border border-ink/15 bg-parchment shadow-sm select-none">
+    <div className="relative w-full md:aspect-video overflow-hidden rounded-xl border border-ink/15 bg-parchment shadow-sm select-none">
+     {/* Arena: 16:9 on every screen size. Controls overlay it from md up; on phones they sit below it. */}
+     <div className="relative aspect-video overflow-hidden md:absolute md:inset-0">
       {/* Village Green Watercolor Backdrop */}
       <div
         className="absolute inset-0"
@@ -612,24 +614,24 @@ export const PlayableFinale: React.FC<PlayableFinaleProps> = ({
       <div className="absolute inset-2.5 rounded-lg border border-ink/10 pointer-events-none z-10" />
 
       {/* Top HUD */}
-      <div className="absolute top-4 inset-x-5 z-20 flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-2.5 rounded-md border border-ink/12 bg-vellum/92 px-3 py-1.5 backdrop-blur-xs">
+      <div className="absolute top-2 inset-x-2 md:top-4 md:inset-x-5 z-20 flex flex-wrap items-center justify-between gap-1 md:gap-3">
+        <div className="flex items-center gap-1.5 md:gap-2.5 whitespace-nowrap rounded-md border border-ink/12 bg-vellum/92 px-2 py-1 md:px-3 md:py-1.5 backdrop-blur-xs">
           <Trophy className="h-3.5 w-3.5 text-chestnut" />
-          <span className="font-mono text-xs font-semibold text-ink tabular-nums">
+          <span className="font-mono text-[11px] md:text-xs font-semibold text-ink tabular-nums">
             {formatConkerRank(wins)}
           </span>
-          <span className="text-bark/50" aria-hidden="true">
+          <span className="hidden sm:inline text-bark/50" aria-hidden="true">
             ·
           </span>
-          <span className="font-mono text-xs text-bark tabular-nums">
+          <span className="hidden sm:inline font-mono text-[11px] md:text-xs text-bark tabular-nums">
             Best: {bestStreak}-er
           </span>
         </div>
 
-        <div className="flex items-center gap-4 rounded-md border border-ink/12 bg-vellum/92 px-3.5 py-1.5 backdrop-blur-xs">
+        <div className="flex items-center gap-1.5 md:gap-4 whitespace-nowrap rounded-md border border-ink/12 bg-vellum/92 px-1.5 py-1 md:px-3.5 md:py-1.5 backdrop-blur-xs">
           <div className="flex items-center gap-2">
             <Shield className="h-3.5 w-3.5 text-oakmoss" />
-            <span className="text-xs font-medium text-ink">Opponent</span>
+            <span className="text-[11px] md:text-xs font-medium text-ink"><span className="hidden sm:inline">Opponent</span><span className="sm:hidden">Opp.</span></span>
             <span className="font-mono text-xs font-semibold text-oakmoss tabular-nums">
               {oppHP}%
             </span>
@@ -639,7 +641,7 @@ export const PlayableFinale: React.FC<PlayableFinaleProps> = ({
           </span>
           <div className="flex items-center gap-2">
             <Swords className="h-3.5 w-3.5 text-chestnut" />
-            <span className="text-xs font-medium text-ink">Yours</span>
+            <span className="text-[11px] md:text-xs font-medium text-ink"><span className="hidden sm:inline">Yours</span><span className="sm:hidden">You</span></span>
             <span className="font-mono text-xs font-semibold text-chestnut tabular-nums">
               {playerHP}%
             </span>
@@ -774,21 +776,22 @@ export const PlayableFinale: React.FC<PlayableFinaleProps> = ({
           </g>
         )}
       </svg>
+     </div>
 
-      {/* Bottom Interactive Swing Control Deck */}
-      <div className="absolute inset-x-5 bottom-4 z-20 flex flex-col items-center gap-2.5">
+      {/* Swing Control Deck: below the arena on phones, over it from md up */}
+      <div className="relative md:absolute inset-x-0 md:inset-x-5 bottom-0 md:bottom-4 z-20 flex flex-col items-center gap-2.5 bg-vellum p-3 md:bg-transparent md:p-0">
         <div className="rounded-lg bg-ink/86 px-4 py-1.5 text-center backdrop-blur-xs">
           <p className="text-xs md:text-sm font-medium text-vellum">
             {statusLine}
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center justify-center gap-3 rounded-xl border border-ink/15 bg-vellum/95 px-4 py-2.5 shadow-sm backdrop-blur-xs">
+        <div className="flex w-full md:w-auto flex-wrap items-center justify-center gap-3 md:rounded-xl md:border md:border-ink/15 md:bg-vellum/95 md:px-4 md:py-2.5 md:shadow-sm md:backdrop-blur-xs">
           <div className="flex items-center gap-2.5">
             <span className="text-xs font-medium text-bark whitespace-nowrap">
               Swing Arc
             </span>
-            <div className="relative h-3 w-36 md:w-44 overflow-hidden rounded-full border border-ink/20 bg-parchment">
+            <div className="relative h-3 w-40 md:w-44 overflow-hidden rounded-full border border-ink/20 bg-parchment">
               <div
                 className="absolute inset-y-0 bg-oakmoss/28 border-x border-oakmoss/50"
                 style={{ left: "62%", width: "26%" }}
@@ -807,7 +810,7 @@ export const PlayableFinale: React.FC<PlayableFinaleProps> = ({
             <button
               type="button"
               onClick={nextChallenger}
-              className="inline-flex items-center gap-2 rounded-lg bg-oakmoss px-4 py-2 text-xs md:text-sm font-semibold text-vellum transition-colors hover:opacity-90 cursor-pointer whitespace-nowrap shrink-0"
+              className="inline-flex w-full md:w-auto justify-center items-center gap-2 rounded-lg bg-oakmoss px-4 py-3 md:py-2 text-xs md:text-sm font-semibold text-vellum transition-colors hover:opacity-90 cursor-pointer whitespace-nowrap shrink-0"
             >
               <Swords className="h-4 w-4" />
               Face Next Challenger
@@ -816,7 +819,7 @@ export const PlayableFinale: React.FC<PlayableFinaleProps> = ({
             <button
               type="button"
               onClick={resetMatch}
-              className="inline-flex items-center gap-2 rounded-lg bg-chestnut px-4 py-2 text-xs md:text-sm font-semibold text-vellum transition-colors hover:bg-chestnut-deep cursor-pointer whitespace-nowrap shrink-0"
+              className="inline-flex w-full md:w-auto justify-center items-center gap-2 rounded-lg bg-chestnut px-4 py-3 md:py-2 text-xs md:text-sm font-semibold text-vellum transition-colors hover:bg-chestnut-deep cursor-pointer whitespace-nowrap shrink-0"
             >
               <RotateCcw className="h-4 w-4" />
               Grab Fresh Conker
@@ -826,8 +829,10 @@ export const PlayableFinale: React.FC<PlayableFinaleProps> = ({
               type="button"
               onPointerDown={startCharge}
               onPointerUp={releaseSwing}
+              onContextMenu={(e) => e.preventDefault()}
               disabled={phase !== "player_idle" && phase !== "player_charging"}
-              className="inline-flex items-center gap-2 rounded-lg bg-chestnut px-4 py-2 text-xs md:text-sm font-semibold text-vellum transition-colors hover:bg-chestnut-deep disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer whitespace-nowrap shrink-0"
+              style={{ WebkitTouchCallout: "none", WebkitUserSelect: "none" }}
+              className="touch-none select-none inline-flex w-full md:w-auto justify-center items-center gap-2 rounded-lg bg-chestnut px-4 py-3 md:py-2 text-xs md:text-sm font-semibold text-vellum transition-colors hover:bg-chestnut-deep disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer whitespace-nowrap shrink-0"
             >
               <Swords className="h-4 w-4" />
               {phase === "player_charging"

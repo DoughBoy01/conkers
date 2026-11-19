@@ -64,6 +64,7 @@ export const FilmTransportBar: React.FC<FilmTransportBarProps> = ({
   onSetMode,
 }) => {
   const trackRef = useRef<HTMLDivElement | null>(null);
+  const draggingRef = useRef(false);
   const activeChapter = getChapterAtTime(currentTime);
   const progressPct = Math.min(100, (currentTime / TOTAL_FILM_DURATION) * 100);
 
@@ -152,10 +153,22 @@ export const FilmTransportBar: React.FC<FilmTransportBarProps> = ({
               } catch {
                 // Ignore synthetic or unsupported pointer capture
               }
+              draggingRef.current = true;
               handleTrackPointer(e.clientX);
             }}
             onPointerMove={(e) => {
-              if (e.buttons === 1) handleTrackPointer(e.clientX);
+              if (draggingRef.current) handleTrackPointer(e.clientX);
+            }}
+            onPointerUp={() => {
+              draggingRef.current = false;
+            }}
+            onPointerCancel={(e) => {
+              draggingRef.current = false;
+              try {
+                e.currentTarget.releasePointerCapture(e.pointerId);
+              } catch {
+                // Already released
+              }
             }}
             onKeyDown={(e) => {
               if (e.key === "ArrowRight") {
@@ -166,7 +179,7 @@ export const FilmTransportBar: React.FC<FilmTransportBarProps> = ({
                 onSeek(Math.max(0, currentTime - 2));
               }
             }}
-            className="relative h-6 flex items-center cursor-pointer group focus-visible:outline-2 focus-visible:outline-chestnut rounded"
+            className="relative h-6 touch-none flex items-center cursor-pointer group focus-visible:outline-2 focus-visible:outline-chestnut rounded [@media(pointer:coarse)]:h-11"
           >
             <div className="relative h-2 w-full rounded-full bg-ink/12 overflow-hidden">
               <div
@@ -196,7 +209,7 @@ export const FilmTransportBar: React.FC<FilmTransportBarProps> = ({
 
       {/* Transport Actions Row */}
       <div className="mt-2.5 flex flex-wrap items-center justify-between gap-3 pt-2.5 border-t border-ink/10">
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
             onClick={() => {
