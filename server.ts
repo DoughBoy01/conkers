@@ -1,5 +1,6 @@
 import "dotenv/config";
 import express from "express";
+import { spawn } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -47,9 +48,72 @@ async function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-async function synthesizeChapterAudio(chapterId: string): Promise<Buffer> {
+function getStaticMp3Path(fileName: string): string | null {
+  const candidates = [
+    path.resolve(__dirname, "public", "audio", fileName),
+    path.resolve(__dirname, "dist", "audio", fileName),
+  ];
+  for (const candidate of candidates) {
+    if (fs.existsSync(candidate)) {
+      return candidate;
+    }
+  }
+  return null;
+}
+
+async function encodeWavToMp3(wavBuffer: Buffer): Promise<Buffer> {
+  return new Promise((resolve, reject) => {
+    const ff = spawn("ffmpeg", [
+      "-v",
+      "error",
+      "-f",
+      "wav",
+      "-i",
+      "pipe:0",
+      "-codec:a",
+      "libmp3lame",
+      "-b:a",
+      "128k",
+      "-ar",
+      "24000",
+      "-ac",
+      "1",
+      "-f",
+      "mp3",
+      "pipe:1",
+    ]);
+
+    const chunks: Buffer[] = [];
+    const errChunks: Buffer[] = [];
+    ff.stdout.on("data", (chunk: Buffer) => chunks.push(chunk));
+    ff.stderr.on("data", (chunk: Buffer) => errChunks.push(chunk));
+    ff.on("error", (err) => reject(err));
+    ff.on("close", (code) => {
+      if (code === 0 && chunks.length > 0) {
+        resolve(Buffer.concat(chunks));
+      } else {
+        reject(
+          new Error(
+            Buffer.concat(errChunks).toString("utf8") ||
+              `ffmpeg exited with code ${code}`
+          )
+        );
+      }
+    });
+    ff.stdin.end(wavBuffer);
+  });
+}
+
+async function synthesizeChapterMp3(chapterId: string): Promise<Buffer> {
   const cached = narrationCache.get(chapterId);
   if (cached) return cached;
+
+  const staticPath = getStaticMp3Path(`${chapterId}.mp3`);
+  if (staticPath) {
+    const fileBuf = await fs.promises.readFile(staticPath);
+    narrationCache.set(chapterId, fileBuf);
+    return fileBuf;
+  }
 
   const existing = inFlightRequests.get(chapterId);
   if (existing) return existing;
@@ -98,8 +162,9 @@ async function synthesizeChapterAudio(chapterId: string): Promise<Buffer> {
         }
 
         const wavBuffer = Buffer.from(base64Audio, "base64");
-        narrationCache.set(chapterId, wavBuffer);
-        return wavBuffer;
+        const mp3Buffer = await encodeWavToMp3(wavBuffer);
+        narrationCache.set(chapterId, mp3Buffer);
+        return mp3Buffer;
       } catch (err) {
         lastError = err;
         if (attempt < 2) {
@@ -137,10 +202,14 @@ async function startServer(): Promise<void> {
     }
 
     try {
-      const wavBuffer = await synthesizeChapterAudio(chapterId);
-      res.setHeader("Content-Type", "audio/wav");
+      const mp3Buffer = await synthesizeChapterMp3(chapterId);
+      res.setHeader("Content-Type", "audio/mpeg");
+      res.setHeader(
+        "Content-Disposition",
+        `inline; filename="conkers-${chapterId}.mp3"`
+      );
       res.setHeader("Cache-Control", "public, max-age=3600");
-      res.send(wavBuffer);
+      res.send(mp3Buffer);
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Narration synthesis failed.";

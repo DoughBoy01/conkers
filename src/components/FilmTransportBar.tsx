@@ -1,6 +1,7 @@
 import React, { useRef } from "react";
 import {
   Captions,
+  Download,
   Pause,
   Play,
   RotateCcw,
@@ -253,6 +254,16 @@ export const FilmTransportBar: React.FC<FilmTransportBarProps> = ({
             )}
             Narration
           </button>
+
+          <a
+            href="/audio/conkers-narration.mp3"
+            download="conkers-narration.mp3"
+            title="Download full narration as MP3"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-ink/15 bg-vellum px-2.5 py-1.5 text-xs font-medium text-bark transition-colors hover:text-ink hover:bg-parchment whitespace-nowrap shrink-0"
+          >
+            <Download className="h-3.5 w-3.5" />
+            MP3
+          </a>
 
           <button
             type="button"

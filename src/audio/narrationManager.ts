@@ -109,9 +109,12 @@ class NarrationManager {
 
     const task = (async () => {
       try {
-        const res = await fetch(
-          `/api/narration?chapterId=${encodeURIComponent(chapterId)}`
-        );
+        let res = await fetch(`/audio/${encodeURIComponent(chapterId)}.mp3`);
+        if (!res.ok) {
+          res = await fetch(
+            `/api/narration?chapterId=${encodeURIComponent(chapterId)}`
+          );
+        }
         if (!res.ok) {
           let detail = "Voiceover narration unavailable.";
           try {
