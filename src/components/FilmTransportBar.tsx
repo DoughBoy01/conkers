@@ -113,7 +113,7 @@ export const FilmTransportBar: React.FC<FilmTransportBarProps> = ({
               }`}
             >
               <Swords className="h-3.5 w-3.5" />
-              Play Finale
+              Play Game
             </button>
           </div>
 

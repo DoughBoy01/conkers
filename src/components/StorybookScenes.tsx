@@ -282,7 +282,7 @@ export const StorybookScenes: React.FC<StorybookScenesProps> = ({
                 className="inline-flex items-center gap-2 rounded-lg border border-ink/20 bg-vellum/90 px-4 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-parchment focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink cursor-pointer whitespace-nowrap shrink-0"
               >
                 <Swords className="h-4 w-4" />
-                Jump to Playable Match
+                Play Game
               </button>
             </div>
           </div>
@@ -308,7 +308,7 @@ export const StorybookScenes: React.FC<StorybookScenesProps> = ({
                 className="inline-flex items-center gap-2 rounded-lg bg-chestnut px-4 py-2 text-xs font-semibold text-vellum transition-colors hover:bg-chestnut-deep cursor-pointer whitespace-nowrap shrink-0"
               >
                 <Swords className="h-3.5 w-3.5" />
-                Play Finale Match
+                Play Game
               </button>
               <button
                 type="button"

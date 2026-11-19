@@ -258,7 +258,7 @@ export default function App() {
             }
             className="rounded-lg bg-chestnut px-4 py-2 text-xs font-semibold text-vellum transition-colors hover:bg-chestnut-deep cursor-pointer whitespace-nowrap shrink-0"
           >
-            {activeMode === "finale" ? "Return to Film" : "Play Finale"}
+            {activeMode === "finale" ? "Return to Film" : "Play Game"}
           </button>
         </div>
       </header>
