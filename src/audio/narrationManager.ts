@@ -1,4 +1,5 @@
 import { STORY_CHAPTERS, type ChapterId } from "../data/storyboard.ts";
+import { primeContext, trackContext, unlockIosAudioSession } from "./iosAudio.ts";
 
 export type NarrationStatus = "idle" | "loading" | "ready" | "error";
 
@@ -51,8 +52,11 @@ class NarrationManager {
         this.gainNode = this.ctx.createGain();
         this.gainNode.gain.value = this.enabled ? 1 : 0;
         this.gainNode.connect(this.ctx.destination);
+        trackContext(this.ctx);
+        primeContext(this.ctx);
       }
-      if (this.ctx.state === "suspended") {
+      // iOS reports "interrupted" as well as "suspended"
+      if (this.ctx.state !== "running") {
         void this.ctx.resume().catch(() => undefined);
       }
       return this.ctx;
@@ -62,6 +66,7 @@ class NarrationManager {
   }
 
   public unlock(): void {
+    unlockIosAudioSession();
     this.ensureContext();
   }
 

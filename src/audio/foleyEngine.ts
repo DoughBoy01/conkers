@@ -1,4 +1,5 @@
 import type { FoleyCueType } from "../data/storyboard.ts";
+import { primeContext, trackContext, unlockIosAudioSession } from "./iosAudio.ts";
 
 class FoleyEngine {
   private ctx: AudioContext | null = null;
@@ -14,8 +15,10 @@ class FoleyEngine {
             .webkitAudioContext;
         if (!AudioCtx) return null;
         this.ctx = new AudioCtx();
+        trackContext(this.ctx);
+        primeContext(this.ctx);
       }
-      if (this.ctx.state === "suspended") {
+      if (this.ctx.state !== "running") {
         void this.ctx.resume().catch(() => undefined);
       }
       return this.ctx;
@@ -29,6 +32,7 @@ class FoleyEngine {
   }
 
   public unlock(): void {
+    unlockIosAudioSession();
     this.ensureContext();
   }
 

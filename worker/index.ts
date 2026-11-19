@@ -80,6 +80,40 @@ async function synthesize(chapterId: string, apiKey: string): Promise<Uint8Array
   throw lastError instanceof Error ? lastError : new Error("Narration synthesis failed.");
 }
 
+const audioBytes = new Map<string, Uint8Array>();
+
+// iOS Safari requires byte-range support (206) to play or seek audio files.
+function serveAudio(request: Request, key: string, type: string, b64: string): Response {
+  let bytes = audioBytes.get(key);
+  if (!bytes) {
+    bytes = b64ToBytes(b64);
+    audioBytes.set(key, bytes);
+  }
+  const total = bytes.length;
+  const base = {
+    "Content-Type": type,
+    "Accept-Ranges": "bytes",
+    "Cache-Control": "public, max-age=86400",
+  };
+  const range = /^bytes=(\d*)-(\d*)$/.exec(request.headers.get("Range") || "");
+  if (range && (range[1] || range[2])) {
+    let start = range[1] ? parseInt(range[1], 10) : total - parseInt(range[2], 10);
+    let end = range[1] && range[2] ? parseInt(range[2], 10) : total - 1;
+    start = Math.max(0, start);
+    end = Math.min(total - 1, end);
+    if (start > end || start >= total) {
+      return new Response(null, { status: 416, headers: { ...base, "Content-Range": `bytes */${total}` } });
+    }
+    return new Response(request.method === "HEAD" ? null : (bytes.slice(start, end + 1) as BodyInit), {
+      status: 206,
+      headers: { ...base, "Content-Range": `bytes ${start}-${end}/${total}`, "Content-Length": String(end - start + 1) },
+    });
+  }
+  return new Response(request.method === "HEAD" ? null : (bytes as BodyInit), {
+    headers: { ...base, "Content-Length": String(total) },
+  });
+}
+
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
@@ -104,11 +138,7 @@ export default {
         return json({ error: e instanceof Error ? e.message : "Narration synthesis failed." }, 500);
       }
     }
-    const proxied = url.pathname.startsWith("/src/assets/")
-      ? url.pathname
-      : url.pathname === "/audio/conkers-narration.mp3"
-        ? "/public" + url.pathname
-        : null;
+    const proxied = url.pathname.startsWith("/src/assets/") ? url.pathname : null;
     if (proxied) {
       const upstream = await fetch(IMAGE_ORIGIN + proxied, {
         cf: { cacheEverything: true, cacheTtl: 86400 },
@@ -123,6 +153,7 @@ export default {
     }
     const hit = FILES[url.pathname];
     if (!hit && url.pathname.startsWith("/audio/")) return new Response("Not found", { status: 404 });
+    if (hit?.b64) return serveAudio(request, url.pathname, hit.type, hit.b64);
     const file = hit ?? FILES["/index.html"];
     return new Response((file.b64 ? b64ToBytes(file.b64) : file.body) as BodyInit, {
       headers: {

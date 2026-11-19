@@ -1,5 +1,5 @@
 // Embeds the small built files (html/js/css) into worker/assets.gen.ts.
-// Images under dist/src/assets and the full-length narration mp3 are NOT embedded; the Worker proxies them.
+// Images under dist/src/assets are NOT embedded; the Worker proxies them.
 import fs from "node:fs";
 import path from "node:path";
 const dist = path.resolve("dist");
@@ -10,7 +10,7 @@ const files = {};
     const p = path.join(dir, e.name);
     if (e.isDirectory()) { if (p !== path.join(dist, "src")) walk(p); continue; }
     const type = types[path.extname(e.name)];
-    if (!type || e.name === "conkers-narration.mp3") continue;
+    if (!type) continue;
     const bin = type.startsWith("audio/");
     files["/" + path.relative(dist, p).split(path.sep).join("/")] = bin
       ? { type, b64: fs.readFileSync(p).toString("base64") }
